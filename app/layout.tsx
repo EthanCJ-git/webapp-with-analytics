@@ -1,22 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Serif_4, Source_Code_Pro } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { site } from "@/content/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSerif = Source_Serif_4({
+  variable: "--font-serif",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceCode = Source_Code_Pro({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Personal portfolio with privacy-first, first-party analytics.",
+  metadataBase: new URL("https://example.com"),
+  title: {
+    default: `${site.name} — ${site.role}`,
+    template: `%s — ${site.name}`,
+  },
+  description: site.tagline,
+  openGraph: {
+    title: `${site.name} — ${site.role}`,
+    description: site.tagline,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -27,14 +37,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sourceSerif.variable} ${sourceCode.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-white text-zinc-950 dark:bg-black dark:text-zinc-50">
+      <body className="flex min-h-full flex-col bg-white text-zinc-950 dark:bg-black dark:text-zinc-50 md:flex-row">
         <Nav />
-        <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
-          {children}
-        </main>
-        <Footer />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
