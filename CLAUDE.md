@@ -4,25 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-This repository is **pre-implementation**. It currently contains only `README.md` and `docs/`
-— no `app/`, `components/`, `lib/`, `supabase/`, or `package.json` exist yet. The docs describe
-the intended design in detail (down to reference implementations of key files), and
-`docs/ROADMAP.md` lays out the build order (Phase 0: scaffold + deploy shell, Phase 1: public
+Phase 0 is done: the app is scaffolded (`create-next-app`, App Router, TypeScript, Tailwind
+v4) but still an empty shell — no `components/`, `lib/`, `supabase/`, or `content/` yet, and
+no Supabase wiring. `docs/ROADMAP.md` lays out the remaining build order (Phase 1: public
 portfolio, Phase 2: analytics write path, Phase 3: auth + dashboard).
 
 When asked to start building, follow the roadmap phase order rather than jumping straight to
 the analytics pipeline — Phase 1 (the portfolio itself) is the point of the project and should
 work before any tracking code exists.
 
-## Commands
+This project is on Next.js 16, which postdates this assistant's training data — see
+`AGENTS.md` for breaking-changes context before writing App Router code that relies on
+remembered conventions.
 
-No `package.json` exists yet, so there is no lint/test/build tooling configured. Once
-scaffolded (Phase 0, via `create-next-app`), the expected commands per `docs/SETUP.md` are:
+## Commands
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in Supabase keys + salt secret
+cp .env.example .env.local   # fill in Supabase keys + salt secret (once Phase 2 adds it)
 npm run dev                  # http://localhost:3000
+npm run build
+npm run lint
 ```
 
 Database schema changes go through `supabase/migrations/*.sql`, applied via the Supabase SQL
