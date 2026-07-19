@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Source_Code_Pro } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
       className={`${sourceSerif.variable} ${sourceCode.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-zinc-950 dark:bg-black dark:text-zinc-50 md:flex-row">
+        <AnalyticsTracker />
         <Nav />
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
