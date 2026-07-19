@@ -11,8 +11,7 @@ the contract for how it behaves and why.
    pathname, referrer, viewport width, and any UTM parameters from the landing URL.
 3. The Edge route reads the raw IP and user agent **from request headers** (the browser
    never sends these in the body), then:
-   - derives the day's salt,
-   - computes `visitor_hash`,
+   - computes `visitor_hash` from a fixed server-side secret + IP + UA,
    - resolves country from Vercel geo headers,
    - parses the user agent into browser / OS / device,
    - drops the request if it looks like a bot.
@@ -67,42 +66,46 @@ response. Failures never surface to the visitor and never block page interactivi
 ## The visitor hash
 
 ```
-day     = current UTC date, formatted YYYY-MM-DD
-salt    = SHA-256( ANALYTICS_SALT_SECRET + "|" + day )
-visitor_hash = SHA-256( salt + "|" + ip + "|" + user_agent )
+visitor_hash = SHA-256( ANALYTICS_SALT_SECRET + "|" + ip + "|" + user_agent )
 ```
 
-- `ANALYTICS_SALT_SECRET` is a long random string in server-only env.
-- The salt changes every UTC midnight, so the same person produces a **different** hash
-  tomorrow. Within a day, their hash is stable, which is what lets us count uniques and
-  stitch sessions.
+- `ANALYTICS_SALT_SECRET` is a long random string in server-only env, used directly as the
+  hash key. It does not rotate, so the same IP + user agent produces the **same** hash every
+  time — that's what lets us recognize a returning visitor tomorrow, next week, or next month.
 - The stored value is a one-way hash. Without the secret you cannot go from a stored hash
-  back to an IP; with a rotated day you cannot link a person across days.
+  back to an IP.
 
-### Why a daily-rotating hash
+### Why a fixed-salt hash instead of a cookie
 
-The alternative — a persistent cookie or UUID — buys long-term identity at the cost of
-storing a durable personal identifier and (in the EU/UK) generally needing a consent banner.
-The daily hash is a deliberate middle ground:
+The goal is to recognize returning visitors across days *without* setting a cookie or
+`localStorage` identifier — both of which are persistent client-side identifiers and
+generally require a consent banner under GDPR/ePrivacy rules. Deriving a stable pseudonymous
+ID server-side from IP + UA gets the same "is this the same person coming back" signal without
+ever touching client storage:
 
-- **We can:** count unique visitors within a day, measure sessions, see returning-within-a-day
-  behavior.
-- **We can't (by design):** recognize the same person across days, build a long-term profile,
-  or reverse a hash to an identity.
+- **We can:** count unique visitors across any time range, measure sessions, and see whether
+  a specific visitor has returned on a later day.
+- **We can't (by design):** go from a stored hash back to an identity — the hash is one-way
+  and the raw IP is never stored.
 
 **Honest limitations:**
 
-- Multi-day "unique visitors" is really *unique-visitor-days*. The dashboard labels it as
-  such; see [DATA_MODEL](DATA_MODEL.md#a-note-on-unique-visitors).
-- Two people behind the same NAT with identical user agents can collide into one hash. Rare
-  at this scale and an acceptable trade for storing no IPs.
-- Because the salt is derived from a fixed secret plus the date, the server *could*
-  recompute any past day's salt. Since raw IPs are never stored, this can't be used to
-  re-identify stored rows. If you want the stronger guarantee where even the operator can't
-  recompute old salts, generate a **random** salt per day, store it in a `salts` table, and
-  delete salts older than two days via a scheduled job. The derived-salt approach is the
-  documented default for its simplicity — this is exactly the kind of trade worth stating
-  out loud in a review.
+- Two people behind the same NAT with identical user agents (e.g. a household, an office)
+  collide into one hash — and because the hash no longer rotates, that collision is now
+  permanent rather than resetting daily. Rare at this scale and an acceptable trade for
+  storing no IPs.
+- Conversely, one person whose IP changes (switching wifi/cellular, a new dynamic IP from
+  their ISP, a VPN) will look like a brand-new visitor, since the hash depends on IP. "Same
+  visitor across days" is therefore a best-effort signal, not a guaranteed identity — see
+  [DATA_MODEL](DATA_MODEL.md#a-note-on-unique-visitors).
+- Because the secret never rotates, anyone who has both the secret and a raw IP/UA pair
+  (from some other source, e.g. server logs elsewhere) could recompute the hash and match it
+  against stored rows indefinitely. Raw IPs are never stored by this project, so that's a
+  theoretical operator-side capability, not a stored-data risk — but it's a strictly weaker
+  guarantee than a rotating salt, and worth stating out loud in a review. If that tradeoff
+  ever stops being acceptable, rotating the salt is the fix — at the cost of no longer
+  recognizing returning visitors past the rotation window (see
+  [ROADMAP](ROADMAP.md#later--optional)).
 
 ---
 
@@ -198,9 +201,7 @@ export async function POST(req: Request) {
     (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "0.0.0.0";
   const country = req.headers.get("x-vercel-ip-country") ?? null;
 
-  const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
-  const salt = await sha256(`${process.env.ANALYTICS_SALT_SECRET}|${day}`);
-  const visitor_hash = await sha256(`${salt}|${ip}|${ua}`);
+  const visitor_hash = await sha256(`${process.env.ANALYTICS_SALT_SECRET}|${ip}|${ua}`);
 
   const { browser, os, device_type } = parseUserAgent(ua);
   const referrer_domain = body.referrer ? safeHost(body.referrer) : null;
@@ -248,7 +249,7 @@ What is collected, and the reasoning:
 | Country (2-letter)                | rough audience geography   | no           |
 | Browser / OS / device             | device-mix chart           | no           |
 | Screen width                      | device-mix chart           | no           |
-| `visitor_hash` (daily, salted)    | same-day uniques + sessions | no (one-way, rotating) |
+| `visitor_hash` (salted)           | uniques, sessions, returning-visitor detection | no (one-way hash, never stores the raw IP/UA) |
 
 What is **never** collected or stored: cookies, localStorage IDs, raw IP addresses,
 full user-agent strings, city/region geo, query strings, form contents, or any account data

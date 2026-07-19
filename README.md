@@ -6,8 +6,9 @@ endpoint in the whole project is a single tracking route — everything else ren
 statically or reads the database directly through Supabase with row-level security.
 
 The analytics layer is deliberately hand-rolled rather than dropped in from a SaaS. It is
-cookieless, stores no raw IP addresses, and uses a daily-rotating hash so no visitor is
-trackable across days. It exists both to answer a real question — *which channels actually
+cookieless and stores no raw IP addresses, but it does recognize returning visitors across
+days via a one-way hash of IP + user agent, so you can tell whether the same person is still
+looking around the site. It exists both to answer a real question — *which channels actually
 drive traffic to my site during a job search* — and to serve as a compact, reviewable
 demonstration of full-stack design.
 
@@ -20,8 +21,9 @@ demonstration of full-stack design.
 - **One API route, by design.** `POST /api/track` is the only custom server endpoint.
   Auth and dashboard reads go directly through Supabase.
 - **Cookieless, GDPR-minded analytics.** No cookies, no localStorage identifiers, no raw
-  IPs at rest. Visitors are identified by a salted daily hash that cannot be linked across
-  days. See [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
+  IPs at rest. Visitors are identified by a salted hash of IP + user agent, which lets us
+  recognize the same visitor across days without ever storing anything client-side. See
+  [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
 - **Owner-only dashboard.** A protected `/dashboard` route shows page views, unique
   visitors, sessions, referrers, UTM breakdowns, and geography. Access is enforced by
   Supabase Auth + Postgres row-level security.
@@ -119,6 +121,9 @@ npm run dev                  # http://localhost:3000
 
 This project is built to collect the minimum data needed to understand traffic, and to
 avoid storing anything that identifies an individual. It is designed with GDPR/CCPA
-principles in mind (no cookies, no persistent identifiers, no raw IPs at rest). It is not
-legal advice — if you deploy your own version, confirm your own obligations. The privacy
-posture is documented in full in [`docs/ANALYTICS.md`](docs/ANALYTICS.md#privacy-posture).
+principles in mind (no cookies, no client-side storage, no raw IPs at rest). The one-way
+visitor hash is a pseudonymous identifier that persists across days by design — that is a
+deliberate tradeoff, not an oversight, and the honest limitations are documented alongside it.
+It is not legal advice — if you deploy your own version, confirm your own obligations. The
+privacy posture is documented in full in
+[`docs/ANALYTICS.md`](docs/ANALYTICS.md#privacy-posture).

@@ -62,8 +62,10 @@ Nice-to-haves that don't block launch.
 - **Custom events** — add an `event_type` column to track résumé downloads and contact-form
   submissions, not just page views.
 - **Data retention job** — scheduled delete of events older than N months.
-- **Stronger salt rotation** — random per-day salt stored and expired, instead of derived
-  from a secret ([ANALYTICS](ANALYTICS.md#why-a-daily-rotating-hash)).
+- **Salt rotation** — if the fixed-salt hash's indefinite linkability ever becomes an
+  unacceptable tradeoff, rotate the salt on a schedule. Note this is in direct tension with
+  cross-day visitor recognition ([ANALYTICS](ANALYTICS.md#why-a-fixed-salt-hash-instead-of-a-cookie))
+  and would need to be a deliberate re-scoping, not a default.
 - **Content out of the repo** — a small CMS or Supabase-backed content table if you want to
   edit projects without deploying. (Note: this adds data-fetching beyond the current
   one-API-route design — a conscious step, not a default.)

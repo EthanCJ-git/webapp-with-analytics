@@ -40,7 +40,7 @@ One row per page view.
 | ----------------- | ------------- | ---- | ------------------------------------------------------------ |
 | `id`              | `bigint`      | no   | Identity PK. `bigint` over `uuid` for cheap sequential inserts. |
 | `created_at`      | `timestamptz` | no   | `default now()`. All time-range queries key off this.        |
-| `visitor_hash`    | `text`        | no   | Salted daily hash of IP + user agent. Stable within a UTC day only. |
+| `visitor_hash`    | `text`        | no   | Salted hash of IP + user agent. Stable indefinitely, so returning visitors are recognized across days. |
 | `path`            | `text`        | no   | Pathname only, e.g. `/projects/analytics`. No query string.  |
 | `referrer`        | `text`        | yes  | Full referrer URL if the browser sent one.                   |
 | `referrer_domain` | `text`        | yes  | Host extracted from `referrer`, e.g. `linkedin.com`. Handy for grouping. |
@@ -93,7 +93,7 @@ create index events_created_at_idx on public.events (created_at desc);
 -- "Top pages" grouping.
 create index events_path_idx on public.events (path);
 
--- Sessionization + unique-visitor counts per visitor within a day.
+-- Sessionization + unique-visitor counts per visitor.
 create index events_visitor_idx on public.events (visitor_hash, created_at);
 ```
 
@@ -149,7 +149,7 @@ How this holds together:
 ## Deriving sessions
 
 A session is a run of page views from one `visitor_hash` with no gap longer than 30 minutes.
-Because the hash is stable within a UTC day, this is a read-time window-function query — no
+Because the hash is stable indefinitely, this is a read-time window-function query — no
 `session_id` is stored.
 
 ```sql
@@ -208,11 +208,13 @@ order by views desc;
 
 ### A note on "unique visitors"
 
-Because the hash rotates every UTC day, `count(distinct visitor_hash)` over a multi-day
-window counts *unique-visitor-days*, not unique people. Over a single day it's a true
-unique count. This is an intentional accuracy-for-privacy trade; the dashboard labels
-multi-day figures accordingly so the numbers aren't misread. Rationale in
-[ANALYTICS](ANALYTICS.md#why-a-daily-rotating-hash).
+Because the hash no longer rotates, `count(distinct visitor_hash)` over any window is a true
+unique-person count *to the extent IP + user agent identifies a person* — with two caveats in
+opposite directions: a visitor whose IP changes (new wifi network, dynamic ISP address, VPN)
+is counted as a new visitor even though it's the same person, and multiple people sharing an
+IP + user agent (same household or office NAT) collide into one. Both are inherent to
+identifying visitors without a client-side ID; rationale in
+[ANALYTICS](ANALYTICS.md#why-a-fixed-salt-hash-instead-of-a-cookie).
 
 ---
 

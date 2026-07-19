@@ -69,8 +69,7 @@ sequenceDiagram
 
     B->>E: POST { path, referrer, screen_width, utm_* }
     Note over E: read IP + UA from request headers
-    Note over E: daily_salt = SHA-256(SALT_SECRET + UTC date)
-    Note over E: visitor_hash = SHA-256(daily_salt + ip + ua)
+    Note over E: visitor_hash = SHA-256(SALT_SECRET + ip + ua)
     Note over E: country from Vercel geo headers
     Note over E: parse UA -> browser / os / device
     alt request is a bot
@@ -151,11 +150,15 @@ work sample than a `<script>` tag; (2) it gives full control over the schema, so
 like "which UTM campaign converted to a contact-form view" are just SQL. The tradeoff is
 that we own bot filtering, sessionization, and the dashboard — all scoped deliberately small.
 
-**Cookieless daily-rotating hash instead of a visitor cookie.**
-A cookie would give stable long-term identity but triggers consent-banner obligations and
-stores a persistent identifier. The daily hash gives us same-day sessionization and unique
-counts while making cross-day tracking impossible by construction. Details and the honest
-limitations are in [ANALYTICS](ANALYTICS.md#why-a-daily-rotating-hash).
+**Cookieless fixed-salt hash instead of a visitor cookie.**
+A cookie or `localStorage` UUID would give stable long-term identity but is a persistent
+client-side identifier, which generally triggers consent-banner obligations under
+GDPR/ePrivacy. Deriving `visitor_hash` server-side from a fixed secret + IP + user agent gets
+the same cross-day recognition — sessionization, unique counts, and "is this the same visitor
+returning" — without ever touching cookies or client storage. The tradeoff is that identity
+tracks the IP + UA pair, not the actual person: it can undercount (IP changes look like a new
+visitor) or overcount (shared IP/UA collide into one). Details and the honest limitations are
+in [ANALYTICS](ANALYTICS.md#why-a-fixed-salt-hash-instead-of-a-cookie).
 
 **Sessionize at query time, not write time.**
 Because the visitor hash is stable within a UTC day, we can derive sessions (30-minute

@@ -60,7 +60,7 @@ Fill in `.env.local`:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | Anon key. Safe in the browser; RLS protects data.  |
 | `SUPABASE_URL`                  | server       | Same URL, for the tracking route.                   |
 | `SUPABASE_SERVICE_ROLE_KEY`     | **server only** | Lets `/api/track` insert. Bypasses RLS. **Never** expose. |
-| `ANALYTICS_SALT_SECRET`         | **server only** | Long random string seeding the daily visitor hash.  |
+| `ANALYTICS_SALT_SECRET`         | **server only** | Long random string seeding the visitor hash.  |
 
 > **The golden rule:** anything prefixed `NEXT_PUBLIC_` is shipped to the browser. The
 > service role key and salt secret must **never** carry that prefix and must never be
