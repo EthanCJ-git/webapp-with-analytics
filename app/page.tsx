@@ -3,8 +3,8 @@ import { site } from "@/content/site";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-sm uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
+    <div className="flex h-full min-h-[60vh] flex-col justify-center gap-6">
+      <p className="font-mono text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">
         {site.role}
       </p>
       <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
