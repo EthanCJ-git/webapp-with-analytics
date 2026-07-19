@@ -20,7 +20,12 @@ export const projects: Project[] = [
     ],
     tech: ["Next.js", "TypeScript", "Tailwind CSS", "Supabase", "Postgres"],
     year: "2026",
-    links: [{ label: "Source", href: "https://github.com/EthanCJ-git" }],
+    links: [
+      {
+        label: "Source",
+        href: "https://github.com/EthanCJ-git/webapp-with-analytics",
+      },
+    ],
   },
   {
     slug: "signalk-cloud",

@@ -18,9 +18,7 @@ export function Nav() {
     <header className="border-b border-black/10 dark:border-white/10 md:w-56 md:shrink-0 md:border-b-0 md:border-r">
       <div className="flex flex-col gap-6 px-6 py-6 md:sticky md:top-0 md:h-screen md:justify-between">
         <div className="flex flex-col gap-6">
-          <Link href="/" className="text-sm font-semibold tracking-tight">
-            {site.name}
-          </Link>
+          <p className="font-semibold tracking-tight">{site.name}</p>
           <nav className="flex flex-row flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600 dark:text-zinc-400 md:flex-col md:gap-3">
             {links.map((link) => {
               const active =
