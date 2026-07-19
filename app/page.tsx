@@ -1,31 +1,55 @@
-import Link from "next/link";
 import { site } from "@/content/site";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-sm uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
-        {site.role}
-      </p>
-      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-        {site.headline}
-      </h1>
-      <p className="max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-        {site.tagline}
-      </p>
-      <div className="flex flex-wrap gap-4 pt-2">
-        <Link
-          href="/projects"
-          className="border border-zinc-950 bg-zinc-950 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-zinc-200"
-        >
-          View projects
-        </Link>
-        <Link
-          href={`mailto:${site.email}`}
-          className="border border-zinc-950 px-5 py-2.5 text-sm font-medium transition-colors hover:bg-zinc-950 hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-black"
-        >
-          Get in touch
-        </Link>
+    <div className="flex flex-col gap-16">
+      <div className="flex flex-col gap-6">
+        <h1 className="text-3xl font-semibold tracking-tight">About</h1>
+        <div className="flex flex-col gap-4 text-zinc-700 dark:text-zinc-300">
+          {site.bio.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold tracking-tight">Skills</h2>
+        <ul className="flex flex-wrap gap-2 font-mono text-xs">
+          {site.skills.map((skill) => (
+            <li
+              key={skill}
+              className="border border-black/10 px-2.5 py-1 dark:border-white/10"
+            >
+              {skill}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex flex-col gap-4 border-t border-black/10 pt-10 dark:border-white/10">
+        <h2 className="text-lg font-semibold tracking-tight">Get in touch</h2>
+        <p className="text-zinc-700 dark:text-zinc-300">
+          The fastest way to reach me is email.
+        </p>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <a
+            href={`mailto:${site.email}`}
+            className="underline underline-offset-4 hover:text-zinc-950 dark:hover:text-zinc-50"
+          >
+            {site.email}
+          </a>
+          {site.socials.map((social) => (
+            <a
+              key={social.href}
+              href={social.href}
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-4 hover:text-zinc-950 dark:hover:text-zinc-50"
+            >
+              {social.label}
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );

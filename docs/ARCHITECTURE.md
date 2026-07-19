@@ -46,7 +46,7 @@ Keeping these paths separate is what lets the "only one API route" rule hold.
 
 | Route group        | Rendering                        | Data source            | Auth |
 | ------------------ | -------------------------------- | ---------------------- | ---- |
-| `/`, `/about`, `/projects`, `/projects/[slug]`, `/contact` | Static (SSG) Server Components | Local MDX / TS content | none |
+| `/`, `/projects`, `/projects/[slug]`, `/contact` | Static (SSG) Server Components | Local MDX / TS content | none |
 | `/dashboard`       | Dynamic Server Component         | Supabase (RLS)         | required |
 | `/login`           | Client component                 | Supabase Auth          | none |
 | `/api/track`       | Edge Function                    | writes Supabase        | none (public) |

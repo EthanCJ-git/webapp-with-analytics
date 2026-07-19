@@ -1,8 +1,6 @@
 export const site = {
   name: "Ethan Jones",
   role: "Full-Stack Software Engineer",
-  headline:
-    "I build production software for logistics and healthcare enterprises — and stick around to support it.",
   tagline:
     "5+ years as a consulting engineer on a Java/Spring Boot and React/TypeScript stack, owning projects end-to-end: architecture, implementation, performance, and production support.",
   email: "ecj000@gmail.com",
