@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -12,9 +13,9 @@ export default function ResumePage() {
       <h1 className="text-3xl font-semibold tracking-tight">Resume</h1>
       <p className="max-w-xl text-zinc-600 dark:text-zinc-400">
         Download a PDF copy below, or see the {" "}
-        <a href="/about" className="underline underline-offset-4 hover:text-zinc-950 dark:hover:text-zinc-50">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-950 dark:hover:text-zinc-50">
           About
-        </a>{" "}
+        </Link>{" "}
         page for the same background in prose form.
       </p>
       <a
