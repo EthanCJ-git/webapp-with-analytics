@@ -1,22 +1,30 @@
 export const site = {
-  name: "Your Name",
-  role: "Software Engineer",
-  headline: "I build fast, privacy-conscious web products.",
+  name: "Ethan Jones",
+  role: "Full-Stack Software Engineer",
+  headline:
+    "I build production software for logistics and healthcare enterprises — and stick around to support it.",
   tagline:
-    "5 years shipping production web applications. Currently focused on full-stack TypeScript, and I care a lot about doing analytics and data collection the right way.",
+    "5+ years as a consulting engineer on a Java/Spring Boot and React/TypeScript stack, owning projects end-to-end: architecture, implementation, performance, and production support.",
   email: "ecj000@gmail.com",
   github: "https://github.com/EthanCJ-git",
-  socials: [{ label: "GitHub", href: "https://github.com/EthanCJ-git" }],
+  socials: [
+    { label: "GitHub", href: "https://github.com/EthanCJ-git" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/ethan-jones" },
+  ],
   bio: [
-    "Replace this paragraph with your own background: where you've worked, what kind of problems you gravitate toward, and what the last 5 years have looked like.",
-    "Add a second paragraph if useful — what you're looking for next, or what makes your approach to engineering distinct.",
+    "I'm a full-stack software engineer with 5+ years delivering and supporting production business applications for enterprise clients, working as a consulting engineer on a core stack of Java/Spring Boot and React/TypeScript. I work end-to-end — architecture, implementation, performance optimization, and production support — partnering directly with stakeholders to turn business requirements into deployed systems.",
+    "Most of that work has been in logistics and supply chain: a shipping-container fulfillment and inventory-tracking application with an integrated EDI client for trading-partner data exchange, and a work-order and reconciliation system for heavy-equipment field operations. I've also built an invoice-processing and spend-tracking application for a large healthcare organization.",
   ],
   skills: [
+    "Java",
+    "Spring Boot",
     "TypeScript",
     "React",
     "Next.js",
-    "Node.js",
-    "PostgreSQL",
+    "Python",
     "SQL",
+    "AWS",
+    "Docker",
+    "Terraform",
   ],
 } as const;

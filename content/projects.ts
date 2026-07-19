@@ -23,25 +23,16 @@ export const projects: Project[] = [
     links: [{ label: "Source", href: "https://github.com/EthanCJ-git" }],
   },
   {
-    slug: "project-two",
-    title: "Project Two",
-    summary: "Replace with a real project — one or two sentences on what it does and why it exists.",
+    slug: "signalk-cloud",
+    title: "SignalK Cloud",
+    summary:
+      "A multi-tenant boat monitoring platform that ingests live SignalK sensor data from sailboats and serves it as historical charts and real-time telemetry.",
     description: [
-      "Replace with a longer description: the problem, your role, and the interesting technical decisions.",
+      "Boats stream SignalK data over MQTT to AWS IoT Core, where it's processed and written to TimeStream for time-series storage and DynamoDB for tenant, organization, and device state. A Spring Boot REST API — secured with Cognito-issued JWTs — serves live and historical data per organization, with subscription tiers gating features like historical charts and alerting.",
+      "Built as a hexagonal architecture with a framework-free domain layer: business rules such as authorization and billing tier limits live in plain-Java domain services, thin use cases orchestrate them, and Spring/AWS specifics stay isolated in adapters. Infrastructure is provisioned with Terraform across IoT Core, TimeStream, DynamoDB, ECS Fargate, and Cognito.",
     ],
-    tech: ["Tech", "Stack", "Here"],
-    year: "2025",
-    links: [],
-  },
-  {
-    slug: "project-three",
-    title: "Project Three",
-    summary: "Replace with a real project — one or two sentences on what it does and why it exists.",
-    description: [
-      "Replace with a longer description: the problem, your role, and the interesting technical decisions.",
-    ],
-    tech: ["Tech", "Stack", "Here"],
-    year: "2024",
-    links: [],
+    tech: ["Java", "Spring Boot", "AWS IoT Core", "TimeStream", "DynamoDB", "Terraform"],
+    year: "2026",
+    links: [{ label: "Source", href: "https://github.com/EthanCJ-git/signalk-cloud" }],
   },
 ];
